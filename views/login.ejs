@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        /* Global Styles */
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Container Styling */
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Headings */
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333333;
+        }
+
+        /* Form Styling */
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #555555;
+        }
+
+        input {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            font-size: 16px;
+            color: #333333;
+        }
+
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .signup-button {
+            margin-top: 10px;
+        }
+
+        .signup-button button {
+            background-color: #28a745;
+        }
+
+        .signup-button button:hover {
+            background-color: #218838;
+        }
+
+        /* Error Messages */
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .visible {
+            display: block;
+        }
+
+        /* Signup Section */
+        .signup-section {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .signup-section p {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #555555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Login</h1>
+        <form id="login-form">
+            <div id="globalError" class="error-message"></div>
+            
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required />
+            <div id="emailError" class="error-message"></div>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required />
+            <div id="passwordError" class="error-message"></div>
+
+            <button type="submit" id="logBtn">Login</button>
+        </form>
+
+        <div class="signup-section">
+            <p>New user? Create an account.</p>
+            <form action="/sign" method="GET">
+                <button type="submit" class="signup-button">Sign Up</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('login-form');
+
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            // Clear previous error messages
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            const globalError = document.getElementById('globalError');
+
+            emailError.textContent = '';
+            passwordError.textContent = '';
+            globalError.textContent = '';
+            emailError.classList.remove('visible');
+            passwordError.classList.remove('visible');
+            globalError.classList.remove('visible');
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            let isValid = true;
+
+            // Front-end validation
+            if (!isValidEmail(email)) {
+                emailError.textContent = 'Please enter a valid email address.';
+                emailError.classList.add('visible');
+                isValid = false;
+            }
+
+            if (password.length < 6) {
+                passwordError.textContent = 'Password must be at least 6 characters long.';
+                passwordError.classList.add('visible');
+                isValid = false;
+            }
+
+            if (isValid) {
+                try {
+                   const response = await fetch('http://localhost:3000/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                   });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        window.location.href = '/user';
+                    } else {
+                        globalError.textContent = result.error || 'An unexpected error occurred.';
+                        globalError.classList.add('visible');
+                    }
+                } catch (error) {
+                    globalError.textContent = 'Error connecting to the server. Please try again later.';
+                    globalError.classList.add('visible');
+                }
+            }
+        });
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+    </script>
+</body>
+</html>

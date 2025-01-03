@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 400px;
+            padding: 30px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input {
+            padding: 10px;
+            margin-bottom: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            color: #333;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 auto;
+            width: 120px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .secondary-button {
+            background-color: #6c757d;
+        }
+
+        .secondary-button:hover {
+            background-color: #5a6268;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sign Up</h1>
+
+        <% if (error) { %>
+            <p class="error-message"><%= error %></p>
+        <% } %>
+
+        <form id="signup-form" action="/sign" method="POST">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username">
+            <span class="error-message" id="nameError"></span>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email">
+            <span class="error-message" id="emailError"></span>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password">
+            <span class="error-message" id="passwordError"></span>
+
+            <button type="submit" id="signup" style="background-color: green;">Sign Up</button>
+        </form>
+
+        <div class="footer">
+            <form action="/">
+                <button type="submit" class="secondary-button">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Client-side form validation
+        const form = document.getElementById('signup-form');
+
+        form.addEventListener('submit', function(event) {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            let isValid = true;
+
+            if (username === '') {
+                isValid = false;
+                showError('Please enter a username', 'nameError');
+            } else {
+                removeError('nameError');
+            }
+
+            if (email === '') {
+                isValid = false;
+                showError('Please enter an email address', 'emailError');
+            } else if (!isValidEmail(email)) {
+                isValid = false;
+                showError('Please enter a valid email address', 'emailError');
+            } else {
+                removeError('emailError');
+            }
+
+            if (password === '') {
+                isValid = false;
+                showError('Please enter a password', 'passwordError');
+            } else if (!isValidPassword(password)) {
+                isValid = false;
+                showError('Password must be at least 6 characters long', 'passwordError');
+            } else {
+                removeError('passwordError');
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function isValidPassword(password) {
+            return password.length >= 6;
+        }
+
+        function showError(message, errorSpanId) {
+            const errorElement = document.getElementById(errorSpanId);
+            errorElement.textContent = message;
+            errorElement.classList.add('error-message');
+        }
+
+        function removeError(errorSpanId) {
+            const errorElement = document.getElementById(errorSpanId);
+            errorElement.textContent = '';
+            errorElement.classList.remove('error-message');
+        }
+    </script>
+</body>
+</html>
